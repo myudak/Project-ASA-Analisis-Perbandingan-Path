@@ -25,7 +25,7 @@ export default function ComparisonTable({ results, enabled }: ComparisonTablePro
               <th>Status</th>
               <th>Cost</th>
               <th>Processed</th>
-              <th>Browser ms</th>
+              <th>Browser runtime (ms)</th>
             </tr>
           </thead>
           <tbody>

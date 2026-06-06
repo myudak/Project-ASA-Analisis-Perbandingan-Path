@@ -1,13 +1,146 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analisis Path Planning Robot: UCS, A*, RRT* | Makalah ASA</title>
     <meta
       name="description"
-      content="Interactive ASA robot path-planning comparison for Brute Force, UCS, GBFS, A*, and RRT*."
+      content="Makalah interaktif dan simulasi perbandingan Brute Force, UCS, GBFS, A*, dan RRT* untuk pencarian jalur robot sepak bola humanoid di lapangan berhalangan."
     />
-    <title>ASA Path Planning Simulator</title>
+    <meta
+      name="keywords"
+      content="path planning robot, A star, A*, UCS, GBFS, RRT*, brute force, analisis algoritma, robot humanoid, simulasi pencarian jalur, makalah ASA"
+    />
+    <meta name="author" content="Muchammad Yuda Tri Ananda" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#171815" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="application-name" content="ASA Robot Path Planning" />
+    <meta
+      name="citation_title"
+      content="Analisis Perbandingan UCS, A*, dan RRT* pada Simulasi Pencarian Jalur Robot Sepak Bola Humanoid di Lapangan Berhalangan"
+    />
+    <meta name="citation_author" content="Muchammad Yuda Tri Ananda" />
+    <meta name="citation_publication_date" content="2026/06/07" />
+    <meta name="citation_language" content="id" />
+    <meta
+      name="citation_pdf_url"
+      content="https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/downloads/Makalah_ASA_Robot_Path_Planning_UCS_Astar_RRTstar.pdf"
+    />
+
+    <link
+      rel="canonical"
+      href="https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/"
+    />
+    <link rel="icon" href="/Project-ASA-Analisis-Perbandingan-Path/favicon.ico" sizes="any" />
+    <link
+      rel="icon"
+      href="/Project-ASA-Analisis-Perbandingan-Path/favicon.svg"
+      type="image/svg+xml"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="/Project-ASA-Analisis-Perbandingan-Path/apple-touch-icon.png"
+    />
+    <link
+      rel="manifest"
+      href="/Project-ASA-Analisis-Perbandingan-Path/site.webmanifest"
+    />
+    <link
+      rel="alternate"
+      type="application/pdf"
+      title="Makalah ASA Robot Path Planning"
+      href="/Project-ASA-Analisis-Perbandingan-Path/downloads/Makalah_ASA_Robot_Path_Planning_UCS_Astar_RRTstar.pdf"
+    />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:site_name" content="ASA Robot Path Planning" />
+    <meta
+      property="og:title"
+      content="Analisis Perbandingan Path Planning Robot: UCS, A*, dan RRT*"
+    />
+    <meta
+      property="og:description"
+      content="Eksplorasi interaktif hasil eksperimen Brute Force, UCS, GBFS, A*, dan RRT* pada pencarian jalur robot humanoid."
+    />
+    <meta
+      property="og:url"
+      content="https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/"
+    />
+    <meta
+      property="og:image"
+      content="https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/images/social-preview.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Perbandingan jalur algoritma UCS, A*, dan RRT* pada lapangan robot berhalangan"
+    />
+    <meta property="article:published_time" content="2026-06-07" />
+    <meta property="article:author" content="Muchammad Yuda Tri Ananda" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Analisis Path Planning Robot: UCS, A*, dan RRT*"
+    />
+    <meta
+      name="twitter:description"
+      content="Makalah interaktif ASA dengan simulasi dan data eksperimen pencarian jalur robot humanoid."
+    />
+    <meta
+      name="twitter:image"
+      content="https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/images/social-preview.png"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Perbandingan jalur algoritma UCS, A*, dan RRT* pada lapangan robot berhalangan"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ScholarlyArticle",
+        "headline": "Analisis Perbandingan UCS, A*, dan RRT* pada Simulasi Pencarian Jalur Robot Sepak Bola Humanoid di Lapangan Berhalangan",
+        "description": "Makalah interaktif dan simulasi perbandingan Brute Force, UCS, GBFS, A*, dan RRT* untuk pencarian jalur robot sepak bola humanoid.",
+        "inLanguage": "id-ID",
+        "datePublished": "2026-06-07",
+        "dateModified": "2026-06-07",
+        "author": {
+          "@type": "Person",
+          "name": "Muchammad Yuda Tri Ananda",
+          "identifier": "2406012410142"
+        },
+        "about": [
+          "Robot path planning",
+          "Uniform Cost Search",
+          "Greedy Best First Search",
+          "A*",
+          "RRT*",
+          "Brute Force"
+        ],
+        "keywords": [
+          "path planning",
+          "robot humanoid",
+          "UCS",
+          "GBFS",
+          "A*",
+          "RRT*",
+          "analisis algoritma"
+        ],
+        "url": "https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/",
+        "mainEntityOfPage": "https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/",
+        "image": "https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/images/social-preview.png",
+        "isAccessibleForFree": true,
+        "publisher": {
+          "@type": "CollegeOrUniversity",
+          "name": "Universitas Diponegoro"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

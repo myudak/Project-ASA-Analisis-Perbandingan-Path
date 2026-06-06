@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://myudak.github.io/Project-ASA-Analisis-Perbandingan-Path/sitemap.xml

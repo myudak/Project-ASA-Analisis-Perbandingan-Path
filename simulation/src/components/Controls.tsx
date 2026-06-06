@@ -60,8 +60,8 @@ export default function Controls({
           <Radar size={22} />
         </div>
         <div>
-          <p className="eyebrow">ASA 2026-1</p>
-          <h1>Robot Path Lab</h1>
+          <p className="eyebrow">Kontrol simulasi</p>
+          <h2>Robot Path Lab</h2>
         </div>
       </div>
 

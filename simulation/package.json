@@ -6,10 +6,12 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json && vite build",
+    "generate:seo": "python scripts/generate_seo_assets.py",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
+    "motion": "^12.40.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1"
   },

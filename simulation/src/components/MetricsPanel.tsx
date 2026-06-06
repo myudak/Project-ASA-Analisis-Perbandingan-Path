@@ -22,7 +22,7 @@ export default function MetricsPanel({ results }: MetricsPanelProps) {
       icon: <Award size={18} />,
     },
     {
-      label: "Fastest run",
+      label: "Fastest browser run",
       value: fastest ? `${formatMs(fastest.runtimeMs)} ms` : "-",
       caption: fastest ? ALGORITHM_BY_KEY[fastest.key].label : "No path",
       icon: <TimerReset size={18} />,
@@ -36,7 +36,7 @@ export default function MetricsPanel({ results }: MetricsPanelProps) {
     {
       label: "Success",
       value: `${successCount}/${results.length}`,
-      caption: "enabled methods",
+      caption: "metode aktif",
       icon: <MousePointer2 size={18} />,
     },
   ];

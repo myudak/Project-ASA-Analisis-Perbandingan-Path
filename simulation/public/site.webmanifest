@@ -1,0 +1,31 @@
+{
+  "name": "ASA Robot Path Planning",
+  "short_name": "ASA Path Lab",
+  "description": "Makalah interaktif dan simulasi perbandingan algoritma pencarian jalur robot humanoid.",
+  "lang": "id-ID",
+  "start_url": "/Project-ASA-Analisis-Perbandingan-Path/",
+  "scope": "/Project-ASA-Analisis-Perbandingan-Path/",
+  "display": "standalone",
+  "background_color": "#171815",
+  "theme_color": "#171815",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
