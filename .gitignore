@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+
+# Word/Office temporary lock files
+~$*.docx
+~WRL*.tmp
+/AWAL_*.docx
+
+# Local render/check scratch directories
+.docx_work/
+.rendered/
+
+# Frontend simulation build artifacts
+simulation/node_modules/
+simulation/dist/
+simulation/*.log
+simulation/*.tsbuildinfo
+simulation/vite.config.js
+simulation/vite.config.d.ts
