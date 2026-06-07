@@ -1,5 +1,7 @@
+import { useState } from "react";
 import {
   Activity,
+  ChevronDown,
   FileText,
   Grid3X3,
   Network,
@@ -53,6 +55,8 @@ export default function Controls({
   onReset,
   onPaperMode,
 }: ControlsProps) {
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
   return (
     <aside className="control-rail" aria-label="Simulation controls">
       <div className="brand-block">
@@ -65,7 +69,7 @@ export default function Controls({
         </div>
       </div>
 
-      <div className="control-group">
+      <div className="control-group scenario-controls">
         <div className="group-title">
           <Activity size={16} />
           Skenario
@@ -84,7 +88,7 @@ export default function Controls({
         </div>
       </div>
 
-      <div className="control-group">
+      <div className="control-group seed-controls">
         <div className="group-title">Seed</div>
         <div className="seed-row" role="group" aria-label="Seed selector">
           {SEEDS.map((item) => (
@@ -95,26 +99,6 @@ export default function Controls({
               onClick={() => onSeedChange(item)}
             >
               {item}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="control-group">
-        <div className="group-title">Algoritma</div>
-        <div className="algorithm-toggles">
-          {ALGORITHMS.map((algorithm) => (
-            <button
-              className={enabled[algorithm.key] ? "algo-toggle active" : "algo-toggle"}
-              key={algorithm.key}
-              type="button"
-              onClick={() => onToggleAlgorithm(algorithm.key)}
-            >
-              <span className="algo-swatch" style={{ backgroundColor: algorithm.tone }} />
-              <span>
-                <strong>{algorithm.label}</strong>
-                <small>{algorithm.description}</small>
-              </span>
             </button>
           ))}
         </div>
@@ -149,7 +133,7 @@ export default function Controls({
         </button>
       </div>
 
-      <div className="control-group">
+      <div className="control-group speed-controls">
         <label className="slider-label" htmlFor="speed">
           Speed
           <span>{speed.toFixed(1)}x</span>
@@ -166,31 +150,71 @@ export default function Controls({
         />
       </div>
 
-      <div className="control-group compact">
-        <button
-          className={showGrid ? "option-toggle active" : "option-toggle"}
-          type="button"
-          onClick={() => onGridChange(!showGrid)}
-        >
-          <Grid3X3 size={16} />
-          Grid
-        </button>
-        <button
-          className={showProcessed ? "option-toggle active" : "option-toggle"}
-          type="button"
-          onClick={() => onProcessedChange(!showProcessed)}
-        >
-          <Activity size={16} />
-          Processed
-        </button>
-        <button
-          className={showTree ? "option-toggle active" : "option-toggle"}
-          type="button"
-          onClick={() => onTreeChange(!showTree)}
-        >
-          <Network size={16} />
-          RRT* tree
-        </button>
+      <button
+        className="advanced-toggle"
+        type="button"
+        aria-expanded={advancedOpen}
+        aria-controls="advanced-simulation-controls"
+        onClick={() => setAdvancedOpen((open) => !open)}
+      >
+        <span>Algoritma & tampilan</span>
+        <ChevronDown size={17} aria-hidden="true" />
+      </button>
+
+      <div
+        id="advanced-simulation-controls"
+        className={advancedOpen ? "advanced-controls open" : "advanced-controls"}
+      >
+        <div className="control-group algorithm-controls">
+          <div className="group-title">Algoritma</div>
+          <div className="algorithm-toggles">
+            {ALGORITHMS.map((algorithm) => (
+              <button
+                className={enabled[algorithm.key] ? "algo-toggle active" : "algo-toggle"}
+                key={algorithm.key}
+                type="button"
+                aria-pressed={enabled[algorithm.key]}
+                onClick={() => onToggleAlgorithm(algorithm.key)}
+              >
+                <span className="algo-swatch" style={{ backgroundColor: algorithm.tone }} />
+                <span>
+                  <strong>{algorithm.label}</strong>
+                  <small>{algorithm.description}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="control-group compact visual-toggles">
+          <button
+            className={showGrid ? "option-toggle active" : "option-toggle"}
+            type="button"
+            aria-pressed={showGrid}
+            onClick={() => onGridChange(!showGrid)}
+          >
+            <Grid3X3 size={16} />
+            Grid
+          </button>
+          <button
+            className={showProcessed ? "option-toggle active" : "option-toggle"}
+            type="button"
+            aria-pressed={showProcessed}
+            onClick={() => onProcessedChange(!showProcessed)}
+          >
+            <Activity size={16} />
+            Processed
+          </button>
+          <button
+            className={showTree ? "option-toggle active" : "option-toggle"}
+            type="button"
+            aria-pressed={showTree}
+            onClick={() => onTreeChange(!showTree)}
+          >
+            <Network size={16} />
+            RRT* tree
+          </button>
+        </div>
       </div>
     </aside>
   );

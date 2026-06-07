@@ -53,6 +53,43 @@ export default function ComparisonTable({ results, enabled }: ComparisonTablePro
           </tbody>
         </table>
       </div>
+
+      <div className="comparison-cards">
+        {ALGORITHMS.map((algorithm) => {
+          const result = results[algorithm.key];
+          return (
+            <article
+              className={enabled[algorithm.key] ? "comparison-card" : "comparison-card disabled-row"}
+              key={algorithm.key}
+            >
+              <header>
+                <span
+                  className="comparison-swatch"
+                  style={{ backgroundColor: algorithm.tone }}
+                />
+                <strong>{algorithm.label}</strong>
+                <span className={result.success ? "status-pill ok" : "status-pill fail"}>
+                  {result.success ? "OK" : "Gagal"}
+                </span>
+              </header>
+              <dl>
+                <div>
+                  <dt>Cost</dt>
+                  <dd>{formatCost(result.cost)}</dd>
+                </div>
+                <div>
+                  <dt>Processed</dt>
+                  <dd>{Math.round(result.processed).toLocaleString("en-US")}</dd>
+                </div>
+                <div>
+                  <dt>Browser runtime</dt>
+                  <dd>{formatMs(result.runtimeMs)} ms</dd>
+                </div>
+              </dl>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }

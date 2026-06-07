@@ -133,16 +133,22 @@ export default function SimulatorLab() {
         variants={staggerContainerVariants(reducedMotion, 0.08)}
       >
         <motion.div
-          className="data-provenance live-provenance"
+          className="data-provenance live-provenance simulator-provenance"
           variants={staggerItemVariants(reducedMotion)}
         >
           <span className="provenance-dot" />
           Simulasi browser saat ini
         </motion.div>
-        <motion.div variants={staggerItemVariants(reducedMotion)}>
+        <motion.div
+          className="simulator-metrics"
+          variants={staggerItemVariants(reducedMotion)}
+        >
           <MetricsPanel results={visibleResults} enabled={enabled} />
         </motion.div>
-        <motion.div variants={staggerItemVariants(reducedMotion)}>
+        <motion.div
+          className="simulator-field"
+          variants={staggerItemVariants(reducedMotion)}
+        >
           <FieldView
             run={run}
             enabled={enabled}
@@ -152,7 +158,10 @@ export default function SimulatorLab() {
             showTree={showTree}
           />
         </motion.div>
-        <motion.div variants={staggerItemVariants(reducedMotion)}>
+        <motion.div
+          className="simulator-results"
+          variants={staggerItemVariants(reducedMotion)}
+        >
           <ComparisonTable results={run.results} enabled={enabled} />
         </motion.div>
       </motion.div>

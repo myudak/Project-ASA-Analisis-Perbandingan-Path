@@ -1,4 +1,4 @@
-import { FileText, Github, Radar } from "lucide-react";
+import { Download, FileText, Github, Radar } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { motionTransition } from "../motion/variants";
 
@@ -6,8 +6,9 @@ const NAV_ITEMS = [
   ["ringkasan", "Ringkasan"],
   ["algoritma", "Algoritma"],
   ["simulasi", "Simulasi"],
+  ["metode", "Metode"],
   ["hasil", "Hasil"],
-  ["kesimpulan", "Kesimpulan"],
+  ["makalah", "Makalah"],
 ] as const;
 
 interface ReportNavProps {
@@ -48,7 +49,21 @@ export default function ReportNav({ paperUrl }: ReportNavProps) {
         >
           <Github size={18} />
         </a>
-        <a className="nav-icon nav-paper" href={paperUrl} aria-label="Unduh PDF makalah" title="PDF makalah">
+        <a
+          className="nav-icon"
+          href={paperUrl}
+          download
+          aria-label="Unduh PDF makalah"
+          title="Unduh PDF"
+        >
+          <Download size={18} />
+        </a>
+        <a
+          className="nav-icon nav-paper"
+          href="#makalah"
+          aria-label="Baca makalah pada halaman ini"
+          title="Baca makalah"
+        >
           <FileText size={18} />
         </a>
       </div>
