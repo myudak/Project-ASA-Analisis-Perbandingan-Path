@@ -1,4 +1,6 @@
 import csvText from "./ringkasan_eksperimen.csv?raw";
+import scalingCsvText from "./ringkasan_grid_scaling.csv?raw";
+import densityCsvText from "./ringkasan_density_sweep.csv?raw";
 import type { AlgorithmKey, ScenarioKind } from "../simulation/types";
 
 export type PaperAlgorithm = "Brute Force" | "UCS" | "GBFS" | "A*" | "RRT*";
@@ -14,6 +16,8 @@ export interface PaperResult {
   stdTimeMs: number;
   meanProcessed: number;
   stdProcessed: number;
+  meanDetour: number;
+  stdDetour: number;
 }
 
 const ALGORITHM_KEYS: Record<PaperAlgorithm, AlgorithmKey> = {
@@ -34,6 +38,12 @@ function numberAt(values: string[], index: number): number {
 
 function parsePaperResults(csv: string): PaperResult[] {
   const lines = csv.trim().split(/\r?\n/);
+  const headers = lines[0].split(",");
+  const index = (name: string) => {
+    const position = headers.indexOf(name);
+    if (position < 0) throw new Error(`Missing CSV column: ${name}`);
+    return position;
+  };
   const rows = lines.slice(1);
 
   return rows.map((line) => {
@@ -48,20 +58,31 @@ function parsePaperResults(csv: string): PaperResult[] {
       scenario: values[0] as ScenarioKind,
       algorithm,
       key: ALGORITHM_KEYS[algorithm],
-      successRate: numberAt(values, 2),
-      meanCost: numberAt(values, 3),
-      stdCost: numberAt(values, 4),
-      meanTimeMs: numberAt(values, 5),
-      stdTimeMs: numberAt(values, 6),
-      meanProcessed: numberAt(values, 7),
-      stdProcessed: numberAt(values, 8),
+      successRate: numberAt(values, index("success_rate")),
+      meanCost: numberAt(values, index("avg_cost")),
+      stdCost: numberAt(values, index("std_cost")),
+      meanDetour: numberAt(values, index("avg_detour_ratio")),
+      stdDetour: numberAt(values, index("std_detour_ratio")),
+      meanTimeMs: numberAt(values, index("avg_time_ms")),
+      stdTimeMs: numberAt(values, index("std_time_ms")),
+      meanProcessed: numberAt(values, index("avg_expanded")),
+      stdProcessed: numberAt(values, index("std_expanded")),
     };
   });
 }
 
+function parseRecords(csv: string): Record<string, string>[] {
+  const lines = csv.trim().split(/\r?\n/);
+  const headers = lines[0].split(",");
+  return lines.slice(1).map((line) =>
+    Object.fromEntries(line.split(",").map((value, index) => [headers[index], value])),
+  );
+}
+
 export const PAPER_RESULTS = parsePaperResults(csvText);
+export const SCALING_RESULTS = parseRecords(scalingCsvText);
+export const DENSITY_RESULTS = parseRecords(densityCsvText);
 
 export function paperResultsForScenario(scenario: ScenarioKind): PaperResult[] {
   return PAPER_RESULTS.filter((result) => result.scenario === scenario);
 }
-

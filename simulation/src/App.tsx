@@ -73,10 +73,10 @@ const SCENARIOS = [
 ] as const;
 
 const PROCESSED_FINDINGS = [
-  { scenario: "Mudah", reduction: "87,9%", cost: "54,82" },
-  { scenario: "Sedang", reduction: "87,6%", cost: "54,49" },
-  { scenario: "Sulit", reduction: "42,6%", cost: "70,76" },
-  { scenario: "Padat", reduction: "67,8%", cost: "57,56" },
+  { scenario: "Mudah", reduction: "88,3%", cost: "54,74" },
+  { scenario: "Sedang", reduction: "83,1%", cost: "55,40" },
+  { scenario: "Sulit", reduction: "42,6%", cost: "70,35" },
+  { scenario: "Padat", reduction: "78,6%", cost: "57,06" },
 ] as const;
 
 interface FigureCaptionProps {
@@ -168,7 +168,7 @@ export default function App() {
             </motion.div>
             <motion.div variants={item}>
               <span>NIM</span>
-              <strong>2406012410142</strong>
+              <strong>24060124110142</strong>
             </motion.div>
             <motion.div variants={item}>
               <span>Program studi</span>
@@ -176,7 +176,7 @@ export default function App() {
             </motion.div>
             <motion.div variants={item}>
               <span>Eksperimen</span>
-              <strong>4 skenario / 5 seed</strong>
+              <strong>4 skenario / 10 seed</strong>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -223,7 +223,7 @@ export default function App() {
                   Evaluasi tidak berhenti pada apakah sebuah jalur ditemukan.
                   Setiap run mencatat biaya lintasan, waktu eksekusi, jumlah
                   processed, dan tingkat keberhasilan. Empat tingkat kepadatan
-                  hambatan serta lima seed digunakan untuk memperlihatkan
+                  hambatan serta sepuluh seed digunakan untuk memperlihatkan
                   performa rata-rata sekaligus variasinya.
                 </motion.p>
               </div>
@@ -427,7 +427,7 @@ export default function App() {
             <div className="reading-grid inverse-reading">
               <div className="reading-column">
                 <p>
-                  Setiap algoritma dijalankan pada empat skenario dan lima seed,
+                  Setiap algoritma dijalankan pada empat skenario dan sepuluh seed,
                   menghasilkan 20 kombinasi pengujian per metode. Pencatatan
                   dilakukan secara sistematis untuk status keberhasilan, biaya,
                   waktu, dan processed sebelum dihitung rata-rata serta
@@ -460,7 +460,7 @@ export default function App() {
               <motion.article className="method-main" variants={item}>
                 <div className="method-number">20</div>
                 <p>kombinasi eksperimen</p>
-                <span>4 skenario × 5 seed</span>
+                <span>4 skenario × 10 seed</span>
               </motion.article>
               <motion.article variants={item}>
                 <Grid3X3 size={23} />
@@ -519,7 +519,7 @@ export default function App() {
               <FigureCaption
                 number="03"
                 title="Eksplorasi biaya, waktu, processed, dan tingkat keberhasilan berdasarkan skenario."
-                source="Sumber: ringkasan eksperimen, rata-rata lima seed."
+                source="Sumber: ringkasan eksperimen, rata-rata sepuluh seed."
               />
             </figure>
 
@@ -566,7 +566,7 @@ export default function App() {
                 <h3>Membaca trade-off, bukan memilih pemenang tunggal.</h3>
                 <p>
                   Pada skenario Mudah, A* memproses 246 simpul dibandingkan
-                  2.041 simpul oleh UCS, atau berkurang sekitar 87,9%, dengan
+                  2.036 simpul oleh UCS, atau berkurang sekitar 88,3%, dengan
                   biaya identik 54,82. Pola pengurangan tetap terlihat pada
                   Sedang, Sulit, dan Padat, meskipun besarnya berubah mengikuti
                   geometri ruang bebas.
@@ -608,7 +608,7 @@ export default function App() {
                 <TriangleAlert size={22} />
                 <h3>Brute Force tidak skalabel</h3>
                 <p>
-                  Keberhasilan turun menjadi 20% pada Sulit dan Padat meski
+                  Keberhasilan turun menjadi 20% pada Sulit dan 30% pada Padat meski
                   tetap menguji 12.721 kandidat.
                 </p>
               </motion.article>
@@ -616,7 +616,7 @@ export default function App() {
                 <RadioTower size={22} />
                 <h3>RRT* lebih variatif</h3>
                 <p>
-                  Pada Padat, simpangan baku waktu mencapai 157,6 ms karena
+                  Pada Padat, simpangan baku waktu mencapai 303,1 ms karena
                   sifat sampling dan rewiring.
                 </p>
               </motion.article>

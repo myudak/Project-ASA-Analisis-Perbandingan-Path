@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Database, Sigma } from "lucide-react";
+import { BarChart3, Database, Sigma, TrendingUp } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   PAPER_RESULTS,
+  SCALING_RESULTS,
+  DENSITY_RESULTS,
   paperResultsForScenario,
   type PaperResult,
 } from "../data/paperResults";
@@ -18,6 +20,98 @@ import {
 } from "../motion/variants";
 
 type MetricKey = "cost" | "time" | "processed";
+type ExplorerMode = "main" | "scaling" | "density";
+
+function TrendChart({
+  mode,
+  metric,
+}: {
+  mode: Exclude<ExplorerMode, "main">;
+  metric: "time" | "quality" | "success";
+}) {
+  const rows = mode === "scaling" ? SCALING_RESULTS : DENSITY_RESULTS;
+  const algorithms = mode === "scaling" ? ["UCS", "GBFS", "A*"] : ALGORITHMS.map((item) => item.label);
+  const xKey = mode === "scaling" ? "cell_count" : "density";
+  const yKey =
+    metric === "time"
+      ? "avg_time_ms"
+      : metric === "quality"
+        ? mode === "scaling"
+          ? "avg_expanded"
+          : "avg_detour_ratio"
+        : "success_rate";
+  const width = 720;
+  const height = 310;
+  const margin = { top: 25, right: 25, bottom: 55, left: 72 };
+  const xValues = [...new Set(rows.map((row) => Number(row[xKey])))].sort((a, b) => a - b);
+  const yMax = Math.max(...rows.map((row) => Number(row[yKey])), 1) * 1.08;
+  const xPosition = (value: number) =>
+    margin.left + (xValues.indexOf(value) / Math.max(1, xValues.length - 1)) * (width - margin.left - margin.right);
+  const yPosition = (value: number) =>
+    height - margin.bottom - (value / yMax) * (height - margin.top - margin.bottom);
+
+  return (
+    <article className="result-chart trend-chart">
+      <div className="chart-heading">
+        <div>
+          <span>{mode === "scaling" ? "Grid scaling" : "Density sweep"}</span>
+          <h3>
+            {metric === "time"
+              ? "Waktu komputasi"
+              : metric === "success"
+                ? "Keberhasilan"
+                : mode === "scaling"
+                  ? "Processed"
+                  : "Detour ratio"}
+          </h3>
+        </div>
+        <TrendingUp size={20} />
+      </div>
+      <svg className="bar-chart" viewBox={`0 0 ${width} ${height}`} role="img">
+        {[0, 0.25, 0.5, 0.75, 1].map((tick) => {
+          const y = yPosition(yMax * tick);
+          return (
+            <g key={tick}>
+              <line className="chart-grid-line" x1={margin.left} x2={width - margin.right} y1={y} y2={y} />
+              <text className="chart-axis-label" x={margin.left - 10} y={y + 4} textAnchor="end">
+                {(yMax * tick).toLocaleString("id-ID", { maximumFractionDigits: 1 })}
+              </text>
+            </g>
+          );
+        })}
+        {algorithms.map((algorithm) => {
+          const group = rows
+            .filter((row) => row.algorithm === algorithm)
+            .sort((a, b) => Number(a[xKey]) - Number(b[xKey]));
+          const key = ALGORITHMS.find((item) => item.label === algorithm)?.key ?? "ucs";
+          const tone = ALGORITHM_BY_KEY[key].tone;
+          const points = group.map((row) => `${xPosition(Number(row[xKey]))},${yPosition(Number(row[yKey]))}`).join(" ");
+          return (
+            <g key={algorithm}>
+              <polyline points={points} fill="none" stroke={tone} strokeWidth="3" />
+              {group.map((row) => (
+                <circle key={row[xKey]} cx={xPosition(Number(row[xKey]))} cy={yPosition(Number(row[yKey]))} r="4.5" fill={tone}>
+                  <title>{`${algorithm}: ${Number(row[yKey]).toFixed(2)}`}</title>
+                </circle>
+              ))}
+            </g>
+          );
+        })}
+        {xValues.map((value) => (
+          <text key={value} className="chart-category-label" x={xPosition(value)} y={height - 22} textAnchor="middle">
+            {mode === "scaling" ? value.toLocaleString("id-ID") : value}
+          </text>
+        ))}
+      </svg>
+      <div className="chart-details">
+        {algorithms.map((algorithm) => {
+          const key = ALGORITHMS.find((item) => item.label === algorithm)?.key ?? "ucs";
+          return <span key={algorithm}><i style={{ backgroundColor: ALGORITHM_BY_KEY[key].tone }} />{algorithm}</span>;
+        })}
+      </div>
+    </article>
+  );
+}
 
 const METRICS: Record<
   MetricKey,
@@ -354,6 +448,7 @@ function SuccessMatrix({ enabled, reducedMotion }: SuccessMatrixProps) {
 
 export default function ResultsExplorer() {
   const reducedMotion = Boolean(useReducedMotion());
+  const [mode, setMode] = useState<ExplorerMode>("main");
   const [scenario, setScenario] = useState<ScenarioKind>("Sulit");
   const [enabled, setEnabled] = useState<Record<AlgorithmKey, boolean>>({
     brute: true,
@@ -391,6 +486,21 @@ export default function ResultsExplorer() {
         variants={staggerContainerVariants(reducedMotion)}
       >
         <div>
+          <p className="toolbar-label">Mode analisis</p>
+          <div className="report-segments" role="group" aria-label="Mode analisis hasil">
+            {([
+              ["main", "Skenario utama"],
+              ["scaling", "Skalabilitas grid"],
+              ["density", "Kepadatan hambatan"],
+            ] as const).map(([key, label]) => (
+              <button key={key} type="button" className={mode === key ? "active" : ""} onClick={() => setMode(key)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {mode === "main" ? <div>
           <p className="toolbar-label">Skenario eksperimen</p>
           <div className="report-segments" role="group" aria-label="Filter skenario hasil">
             {SCENARIOS.map((item) => (
@@ -408,9 +518,9 @@ export default function ResultsExplorer() {
               </motion.button>
             ))}
           </div>
-        </div>
+        </div> : null}
 
-        <div>
+        {mode === "main" ? <div>
           <p className="toolbar-label">Algoritma ditampilkan</p>
           <div className="result-algorithm-filter" role="group" aria-label="Filter algoritma hasil">
             {ALGORITHMS.map((algorithm) => (
@@ -429,15 +539,15 @@ export default function ResultsExplorer() {
               </motion.button>
             ))}
           </div>
-        </div>
+        </div> : null}
 
         <div className="data-provenance">
           <Database size={15} />
-          Data makalah, rata-rata 5 seed
+          Data makalah, 10 seed feasible
         </div>
       </motion.div>
 
-      <motion.div
+      {mode === "main" ? <motion.div
         className="charts-grid"
         variants={staggerContainerVariants(reducedMotion, 0.08)}
       >
@@ -445,7 +555,13 @@ export default function ResultsExplorer() {
         <BarChart metric="time" rows={rows} reducedMotion={reducedMotion} />
         <BarChart metric="processed" rows={rows} reducedMotion={reducedMotion} />
         <SuccessMatrix enabled={enabled} reducedMotion={reducedMotion} />
-      </motion.div>
+      </motion.div> : (
+        <div className="charts-grid">
+          <TrendChart mode={mode} metric="time" />
+          <TrendChart mode={mode} metric="quality" />
+          {mode === "density" ? <TrendChart mode={mode} metric="success" /> : null}
+        </div>
+      )}
     </motion.div>
   );
 }

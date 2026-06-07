@@ -1,9 +1,9 @@
 import { PythonRandom } from "./random";
 import type { Cell, Circle, MapScenario, Rect, ScenarioKind } from "./types";
-import { cellCenter, distance } from "./geometry";
+import { cellCenter, distance, neighbors8 } from "./geometry";
 
 export const SCENARIOS: ScenarioKind[] = ["Mudah", "Sedang", "Sulit", "Padat"];
-export const SEEDS = [0, 1, 2, 3, 4] as const;
+export const SEEDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 export const GRID_WIDTH = 60;
 export const GRID_HEIGHT = 40;
 export const START: Cell = [3, 20];
@@ -85,5 +85,26 @@ export function scenarioFromKindSeed(
   kind: ScenarioKind,
   seedIndex: number,
 ): MapScenario {
-  return scenarioFromSeed(kind, scenarioSeed(kind, seedIndex));
+  for (let attempt = 0; attempt < 1000; attempt += 1) {
+    const scenario = scenarioFromSeed(
+      kind,
+      scenarioSeed(kind, seedIndex) + attempt * 100_003,
+    );
+    const queue: Cell[] = [scenario.start];
+    const visited = new Set([scenario.start.join(",")]);
+    for (let index = 0; index < queue.length; index += 1) {
+      const current = queue[index];
+      for (const [neighbor] of neighbors8(scenario, current)) {
+        const key = neighbor.join(",");
+        if (!visited.has(key)) {
+          visited.add(key);
+          queue.push(neighbor);
+        }
+      }
+    }
+    if (visited.has(scenario.goal.join(","))) {
+      return scenario;
+    }
+  }
+  throw new Error(`Unable to generate a solvable ${kind} scenario.`);
 }

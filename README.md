@@ -27,7 +27,7 @@ Makalah ini membandingkan lima algoritma pencarian jalur pada simulasi lapangan 
 | **A\*** | Grid 8-arah, prioritas g(n)+h(n) | ✅ Item (g) |
 | **RRT\*** | Sampling kontinu + rewiring | 🔵 Di luar daftar |
 
-Eksperimen dijalankan pada **4 skenario** (Mudah → Padat) × **5 seed acak**, mengukur tingkat keberhasilan, biaya lintasan, waktu eksekusi, dan jumlah node yang diproses.
+Eksperimen utama dijalankan pada **4 skenario** (Mudah → Padat) × **10 seed peta feasible**. Setiap runtime diukur tiga kali dan nilai median per peta digunakan sebelum agregasi. Analisis tambahan menguji enam resolusi grid dan enam tingkat kepadatan hambatan.
 
 ---
 
@@ -41,7 +41,7 @@ Eksperimen dijalankan pada **4 skenario** (Mudah → Padat) × **5 seed acak**, 
 │   └── template/           # Template IEEE
 ├── src/
 │   └── asa_path_planning/  # Kode eksperimen Python
-├── notebooks/              # Notebook analisis dan penjelasan hasil
+├── notebooks/              # Notebook eksperimen dan analisis lengkap
 ├── results/
 │   ├── data/               # CSV hasil eksperimen
 │   └── figures/            # Gambar output
@@ -66,14 +66,28 @@ uv lock
 uv run asa-path-planning
 ```
 
+Suite dapat dijalankan terpisah:
+
+```powershell
+uv run asa-path-planning --suite main
+uv run asa-path-planning --suite scaling
+uv run asa-path-planning --suite density
+```
+
 Output yang dihasilkan secara default:
 
 ```
 results/data/hasil_eksperimen.csv       ← data mentah per seed
 results/data/ringkasan_eksperimen.csv   ← rata-rata & std dev per skenario
+results/data/hasil_grid_scaling.csv
+results/data/ringkasan_grid_scaling.csv
+results/data/hasil_density_sweep.csv
+results/data/ringkasan_density_sweep.csv
 results/figures/fig_perbandingan_jalur.png
 results/figures/fig_waktu_rata_rata.png
 results/figures/fig_processed_grid.png
+results/figures/fig_grid_scaling.png
+results/figures/fig_density_sweep.png
 ```
 
 ### Custom Output Directory
@@ -94,9 +108,10 @@ uv sync --extra notebook
 uv run --extra notebook jupyter lab notebooks/analisis_path_planning.ipynb
 ```
 
-Notebook memverifikasi perbandingan UCS dan A*, membahas spike processed A* pada
-skenario Sulit, menampilkan visualisasi hasil, dan menyediakan opsi untuk menjalankan
-ulang eksperimen penuh.
+Notebook menjalankan kelima algoritma pada satu kasus lengkap, memvalidasi lintasan,
+memvisualisasikan peta dan pohon RRT*, lalu menganalisis seluruh data mentah untuk
+keberhasilan, detour ratio, runtime, processed, audit solvability, scaling grid,
+robustness terhadap kepadatan, dan variasi antarseed.
 
 ---
 
@@ -132,9 +147,12 @@ pnpm build
 
 | Skenario | Algoritma Terbaik (Biaya) | Algoritma Tercepat | Catatan |
 |----------|--------------------------|-------------------|---------|
-| Mudah | Brute Force (53.34) | GBFS (7.4 ms) | Semua berhasil 100% |
-| Sedang | A* / UCS (54.49) | GBFS (11.1 ms) | Brute Force 80% |
-| Sulit | A* / UCS (70.76) | GBFS (33.8 ms) | Brute Force 20% |
-| Padat | A* / UCS (57.56) | GBFS (182.6 ms) | Semua kecuali BF 80% |
+| Mudah | Brute Force (53.36) | GBFS (8.3 ms) | Semua berhasil 100% |
+| Sedang | A* / UCS (55.40) | GBFS (18.7 ms) | Brute Force berhasil 80% |
+| Sulit | A* / UCS (70.35) | GBFS (29.1 ms) | Brute Force 20%; RRT* 90% |
+| Padat | A* / UCS (57.06) | GBFS (20.1 ms) | Brute Force berhasil 30% |
 
-**Kesimpulan utama:** A\* adalah pilihan paling seimbang — biaya optimal setara UCS dengan ekspansi node 42.6–87.9% lebih sedikit di seluruh skenario.
+**Kesimpulan utama:** A\* mempertahankan biaya UCS pada seluruh peta grid feasible
+dengan eksplorasi lebih terarah. Sweep kepadatan menunjukkan Brute Force paling
+cepat kehilangan reliabilitas, sedangkan scaling grid memperlihatkan pertumbuhan
+runtime UCS dan A* yang mendekati linear terhadap jumlah sel pada rentang pengujian.
