@@ -33,6 +33,7 @@ GOAL: Cell = (56, 20)
 DETAIL_SCENARIO = "Sulit"
 DETAIL_SEED = 4
 ALGORITHM_ORDER = ("Brute Force", "UCS", "GBFS", "A*", "RRT*")
+GRID_ALGORITHM_ORDER = ("UCS", "GBFS", "A*")
 
 
 @dataclass(frozen=True)
@@ -533,7 +534,7 @@ def run_grid_algorithm(
 def run_experiment(
     data_dir: Path = DEFAULT_DATA_DIR,
     figures_dir: Path = DEFAULT_FIGURES_DIR,
-) -> tuple[Path, Path, Path, Path, list[dict[str, object]]]:
+) -> tuple[Path, Path, Path, Path, Path, list[dict[str, object]]]:
     data_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
 
@@ -582,14 +583,16 @@ def run_experiment(
     summary_csv = data_dir / "ringkasan_eksperimen.csv"
     path_figure = figures_dir / "fig_perbandingan_jalur.png"
     time_figure = figures_dir / "fig_waktu_rata_rata.png"
+    processed_figure = figures_dir / "fig_processed_grid.png"
 
     write_detailed_results(detailed_csv, rows)
     summary = aggregate_results(rows)
     write_summary(summary_csv, summary)
     plot_path_comparison(path_figure, detail_paths)
     plot_average_runtime(time_figure, summary)
+    plot_grid_processed(processed_figure, summary)
 
-    return detailed_csv, summary_csv, path_figure, time_figure, summary
+    return detailed_csv, summary_csv, path_figure, time_figure, processed_figure, summary
 
 
 def result_row(
@@ -715,6 +718,7 @@ def plot_path_comparison(
 
 def plot_average_runtime(path: Path, summary: list[dict[str, object]]) -> None:
     plt.figure(figsize=(6.2, 3.8), dpi=220)
+    axis = plt.gca()
     x_positions = list(range(len(SCENARIOS)))
     bar_width = 0.16
 
@@ -727,13 +731,77 @@ def plot_average_runtime(path: Path, summary: list[dict[str, object]]) -> None:
             )["avg_time_ms"]
             for scenario in SCENARIOS
         ]
+        deviations = [
+            next(
+                row
+                for row in summary
+                if row["scenario"] == scenario and row["algorithm"] == algorithm
+            )["std_time_ms"]
+            for scenario in SCENARIOS
+        ]
         offset = (index - (len(ALGORITHM_ORDER) - 1) / 2) * bar_width
-        plt.bar([x + offset for x in x_positions], values, width=bar_width, label=algorithm)
+        axis.bar(
+            [x + offset for x in x_positions],
+            values,
+            width=bar_width,
+            yerr=deviations,
+            capsize=2,
+            error_kw={"elinewidth": 0.7, "capthick": 0.7},
+            label=algorithm,
+        )
 
-    plt.xticks(x_positions, SCENARIOS)
-    plt.ylabel("Waktu rata-rata (ms)")
-    plt.title("Waktu eksekusi rata-rata per skenario", fontsize=9)
-    plt.legend(fontsize=6, ncols=2)
+    axis.set_xticks(x_positions, SCENARIOS)
+    axis.set_ylabel("Waktu rata-rata (ms)")
+    axis.set_title("Waktu eksekusi rata-rata per skenario", fontsize=9)
+    axis.legend(fontsize=6, ncols=2)
+    axis.grid(axis="y", linewidth=0.3, alpha=0.3)
+    axis.set_ylim(bottom=0)
+    plt.tight_layout()
+    plt.savefig(path, bbox_inches="tight")
+    plt.close()
+
+
+def format_indonesian_number(value: float) -> str:
+    if value.is_integer():
+        return f"{int(value):,}".replace(",", ".")
+
+    whole, fraction = f"{value:,.1f}".split(".")
+    return f"{whole.replace(',', '.')},{fraction}"
+
+
+def plot_grid_processed(path: Path, summary: list[dict[str, object]]) -> None:
+    plt.figure(figsize=(6.2, 3.8), dpi=220)
+    axis = plt.gca()
+    x_positions = list(range(len(SCENARIOS)))
+    bar_width = 0.24
+
+    for index, algorithm in enumerate(GRID_ALGORITHM_ORDER):
+        values = [
+            float(
+                next(
+                    row
+                    for row in summary
+                    if row["scenario"] == scenario and row["algorithm"] == algorithm
+                )["avg_expanded"]
+            )
+            for scenario in SCENARIOS
+        ]
+        offset = (index - (len(GRID_ALGORITHM_ORDER) - 1) / 2) * bar_width
+        bars = axis.bar(
+            [x + offset for x in x_positions],
+            values,
+            width=bar_width,
+            label=algorithm,
+        )
+        labels = [format_indonesian_number(value) for value in values]
+        axis.bar_label(bars, labels=labels, padding=2, fontsize=6, rotation=90)
+
+    axis.set_xticks(x_positions, SCENARIOS)
+    axis.set_ylabel("Jumlah processed rata-rata")
+    axis.set_title("Processed algoritma grid per skenario", fontsize=9)
+    axis.legend(fontsize=7, ncols=3)
+    axis.grid(axis="y", linewidth=0.3, alpha=0.3)
+    axis.set_ylim(0, axis.get_ylim()[1] * 1.13)
     plt.tight_layout()
     plt.savefig(path, bbox_inches="tight")
     plt.close()
@@ -760,15 +828,20 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    detailed_csv, summary_csv, path_figure, time_figure, summary = run_experiment(
-        data_dir=args.data_dir,
-        figures_dir=args.figures_dir,
-    )
+    (
+        detailed_csv,
+        summary_csv,
+        path_figure,
+        time_figure,
+        processed_figure,
+        summary,
+    ) = run_experiment(data_dir=args.data_dir, figures_dir=args.figures_dir)
 
     print(f"Detailed CSV: {detailed_csv}")
     print(f"Summary CSV:  {summary_csv}")
     print(f"Path figure:  {path_figure}")
     print(f"Time figure:  {time_figure}")
+    print(f"Grid figure:  {processed_figure}")
     print()
     for row in summary:
         print(row)

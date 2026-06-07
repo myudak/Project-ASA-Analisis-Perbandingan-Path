@@ -8,6 +8,14 @@ dependencies = [
     "matplotlib>=3.10",
 ]
 
+[project.optional-dependencies]
+notebook = [
+    "ipykernel>=6.29",
+    "jupyterlab>=4.4",
+    "nbconvert>=7.16",
+    "pandas>=2.2",
+]
+
 [project.scripts]
 asa-path-planning = "asa_path_planning.experiment:main"
 
